@@ -32,12 +32,41 @@ function getCookie(name) {
 if (getCookie("saCookie") == undefined) {
     createCookie(5);
 }
+var query_params = window.location.search;
+// The smallest meaningful length
+if (query_params.length > 3) {
+    console.log(query_params.substring(1));
+    var data={
+        query: query_params.substring(1)
+    }
+    sendAnalytics(data, "query");
+}
 console.log(getCookie("saCookie"));
 console.log(`${location.pathname}`);
 var data={
     path: `${location.pathname}`
 }
 sendAnalytics(data, "pageview");
+
+// Store mouse moves here
+var moves = [];
+document.addEventListener('mousemove', function (event) {
+    //console.log("mousemove");
+    moves.push(event.pageX+','+event.pageY);
+}, false);
+
+function sendMoves() {
+    if (moves.length > 0) {
+        var movesToSend = moves.join(';');
+        console.log(movesToSend);
+        moves = []; // reset
+        var data={
+            moves: movesToSend
+        }
+        sendAnalytics(data, "moves");
+    }
+}
+setInterval(sendMoves, 5000);
 
 document.addEventListener('click', function (event) {
     console.log(event.target);
